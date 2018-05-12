@@ -68,3 +68,8 @@ Thumbs.db
 *.exe
 *.out
 *.app
+*.opendb
+*.idb
+*.pdb
+*.tlog
+*.suo
