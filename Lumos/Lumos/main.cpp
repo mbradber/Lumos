@@ -52,14 +52,46 @@ static int setarray(lua_State *L) {
 	return 0;
 }
 
+static int getarray(lua_State *L) {
+	NumArray *a = (NumArray*)lua_touserdata(L, 1);
+	int index = luaL_checkint(L, 2) - 1;
+
+	luaL_argcheck(L, a != NULL, 1, "'array' expected");
+	luaL_argcheck(L, 0 <= index && index < a->size, 2, "index out of range");
+
+	lua_pushboolean(L, a->values[I_WORD(index)] & I_BIT(index));
+	return 1;
+}
+
+static int getsize(lua_State *L) {
+	NumArray *a = (NumArray*)lua_touserdata(L, 1);
+	luaL_argcheck(L, a != NULL, 1, "'array' expected");
+	lua_pushinteger(L, a->size);
+	return 1;
+}
+
+static const struct luaL_Reg arraylib[] = {
+	{ "new", newarray },
+	{ "set", setarray },
+	{ "get", getarray },
+	{ "size", getsize },
+	{ NULL, NULL }
+};
+
+int luaopen_array(lua_State *L) {
+	luaL_register(L, "array", arraylib);
+	return 1;
+}
+
 // TODO: get rid of hard-coded path
 static std::string scriptsPath = "C:\\Users\\mbradberry\\dev\\lumos\\Lumos\\Lumos\\scripts\\";
 
 int main (void) {
 	lua_State* L = luaL_newstate();
 	luaL_openlibs(L);
+	luaopen_array(L);
 
-	std::string script = scriptsPath + "test1.lua";
+	std::string script = scriptsPath + "testarray.lua";
 
 	if (luaL_loadfile(L, script.c_str())) {
 		std::cout << "couldn't open script" << std::endl;
